@@ -132,7 +132,51 @@ class NotesController extends Controller
      */
     public function update(Request $request, Notes $notes)
     {
-        //
+        try {
+            $isIdString = gettype($request->id) === 'string';
+            $id = $isIdString ? $request->id : '';
+
+            if (!Uuid::isValid($id)) {
+                throw new \Exception('The id field must be a valid UUID.', 400);
+            }
+
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'body' => 'required|string|max:255',
+                'tags' => 'required|array|max:255',
+            ]);
+
+            $tags = implode(',', $validated['tags']);
+
+            $note = $notes->where('id', $id)->update([
+                ...$validated,
+                'tags' => $tags,
+            ]);
+
+            if ($note) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Catatan berhasil diperbarui',
+                ]);
+            }
+
+            throw new \Exception('Catatan tidak ditemukan', 404);
+        } catch (\Exception $e) {
+            $statusCode;
+
+            if ($e->getCode()) {
+                $statusCode = $e->getCode();
+            } elseif ($e->status) {
+                $statusCode = $e->status;
+            } else {
+                $statusCode = 500;
+            }
+
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], $statusCode);
+        }
     }
 
     /**

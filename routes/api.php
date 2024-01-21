@@ -23,4 +23,5 @@ Route::controller(NotesController::class)->group(function () {
     Route::post('/notes', 'store');
     Route::get('/notes', 'index');
     Route::get('/notes/{id}', 'show');
+    Route::put('/notes/{id}', 'update');
 });
