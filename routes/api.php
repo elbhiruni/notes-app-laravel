@@ -21,4 +21,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::controller(NotesController::class)->group(function () {
     Route::post('/notes', 'store');
+    Route::get('/notes', 'index');
 });

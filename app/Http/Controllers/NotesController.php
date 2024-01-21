@@ -12,7 +12,24 @@ class NotesController extends Controller
      */
     public function index()
     {
-        //
+        $notes = Notes::get();
+
+        foreach ($notes as $note) {
+            $note['tags'] = explode(',', $note['tags']);
+
+            $note['createdAt'] = $note['created_at'];
+            $note['updatedAt'] = $note['created_at'];
+
+            unset($note['created_at']);
+            unset($note['updated_at']);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data'=> [
+                'notes' => $notes,
+            ]
+        ]);
     }
 
     /**
