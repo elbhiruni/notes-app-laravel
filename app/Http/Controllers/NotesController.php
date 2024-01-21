@@ -182,8 +182,33 @@ class NotesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Notes $notes)
+    public function destroy(Request $request, Notes $notes)
     {
-        //
+        try {
+            $isIdString = gettype($request->id) === 'string';
+            $id = $isIdString ? $request->id : '';
+
+            if (!Uuid::isValid($id)) {
+                throw new \Exception('The id field must be a valid UUID.', 400);
+            }
+
+            $note = $notes->where('id', $id)->delete();
+
+            if ($note) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Catatan berhasil dihapus',
+                ]);
+            }
+
+            throw new \Exception('Catatan gagal dihapus. Id tidak ditemukan', 404);
+        } catch (\Exception $e) {
+            $statusCode = $e->getCode() ? $e->getCode() : 500;
+
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], $statusCode);
+        }
     }
 }

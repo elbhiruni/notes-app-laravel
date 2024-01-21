@@ -24,4 +24,5 @@ Route::controller(NotesController::class)->group(function () {
     Route::get('/notes', 'index');
     Route::get('/notes/{id}', 'show');
     Route::put('/notes/{id}', 'update');
+    Route::delete('/notes/{id}', 'destroy');
 });
