@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\NotesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -16,4 +17,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::controller(NotesController::class)->group(function () {
+    Route::post('/notes', 'store');
 });
