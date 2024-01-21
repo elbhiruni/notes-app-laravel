@@ -160,7 +160,7 @@ class NotesController extends Controller
                 ]);
             }
 
-            throw new \Exception('Catatan tidak ditemukan', 404);
+            throw new \Exception('Gagal memperbarui catatan. Id tidak ditemukan', 404);
         } catch (\Exception $e) {
             $statusCode;
 
