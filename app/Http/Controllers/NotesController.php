@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Notes;
 use Illuminate\Http\Request;
+use Ramsey\Uuid\Uuid;
 
 class NotesController extends Controller
 {
@@ -77,9 +78,45 @@ class NotesController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Notes $notes)
+    public function show(Request $request)
     {
-        //
+        try {
+            $isIdString = gettype($request->id) === 'string';
+            $id = $isIdString ? $request->id : '';
+
+            if (!Uuid::isValid($id)) {
+                throw new \Exception('The id field must be a valid UUID.', 400);
+            }
+
+            $note = Notes::where('id', $id)->first();
+
+            if ($note) {
+                $note['tags'] = explode(',', $note['tags']);
+
+                $note['createdAt'] = $note['created_at'];
+                $note['updatedAt'] = $note['created_at'];
+
+                unset($note['created_at']);
+                unset($note['updated_at']);
+
+                return response()->json([
+                    'status' => 'success',
+                    'data' => [
+                        'note' => $note,
+                    ],
+                ]);
+            }
+
+            throw new \Exception('Catatan tidak ditemukan', 404);
+        } catch (\Exception $e) {
+            $statusCode = $e->getCode() ? $e->getCode() : 500;
+
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+                'data' => null,
+            ], $statusCode);
+        }
     }
 
     /**
